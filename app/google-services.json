@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "31728479242",
+    "project_id": "ofbil-76327",
+    "storage_bucket": "ofbil-76327.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:31728479242:android:4872d04ccba973096883f3",
+        "android_client_info": {
+          "package_name": "com.example.ofbil"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "31728479242-32ctf09m16ph0pqn8mmno3du3c6s8ctp.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAD1FGWJ_Uh5FTo7rMRvDh7hfKA8loMB6c"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "31728479242-32ctf09m16ph0pqn8mmno3du3c6s8ctp.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

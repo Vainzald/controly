@@ -5,6 +5,6 @@ data class Usuario(
     val apellido : String,
 //    val organizacion : String,
     val fechaNacimiento : String,
-    val mail : String
+    val idUsuario : String
 ) {
 }

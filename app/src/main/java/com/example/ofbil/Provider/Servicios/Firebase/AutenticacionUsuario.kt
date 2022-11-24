@@ -4,30 +4,26 @@ import android.app.Activity
 import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
-import android.provider.Settings.Global.getString
-import android.widget.Toast
-import androidx.core.app.ActivityCompat.startActivityForResult
-import androidx.core.content.ContextCompat.startActivity
-import com.example.ofbil.HomeActivity
+import android.util.Log
 import com.example.ofbil.Model.Usuario
-import com.example.ofbil.ProviderType
-import com.example.ofbil.R
-import com.example.ofbil.usecases.Auth.AuthActivity
 import com.example.ofbil.usecases.Base.BaseActivityRouter
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
-import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.GoogleAuthProvider
-import kotlin.properties.Delegates
 
 class AutenticacionUsuario(val context: Context, val activity : Activity)  {
+
     private val GOOGLE_SIGN_IN = 100
-    private var sesion by Delegates.notNull<Boolean>()
+    private var sesion : Boolean = false
     private var intent : BaseActivityRouter = BaseActivityRouter()
+    private var db : database = database()
+    private var idUsuario : String = ""
+    private var apellido : String = ""
+    private var nombre : String = ""
 
 
-    fun signUp(mail : String, Contraseña : String,usuario: Usuario ){
+    fun signUp(mail : String, Contraseña : String,usuario: Usuario ) : Boolean{
+
         FirebaseAuth.getInstance()
             .createUserWithEmailAndPassword(
                 mail,
@@ -35,28 +31,49 @@ class AutenticacionUsuario(val context: Context, val activity : Activity)  {
             ).addOnCompleteListener {
                 if (it.isSuccessful) {
                     it.addOnCompleteListener {
-                        initDB(usuario)
+                        db.guardar(usuario)
+                        showHome()
                     }
+
 
                 } else {
                     showAlert()
                 }
             }
+        return sesion
 
 
     }
-    fun signIn(mail: String, contraseña : String) {
+    fun signIn(mail: String, contraseña: String, getUser: (String, String, String) -> Unit) {
+
         FirebaseAuth.getInstance()
             .signInWithEmailAndPassword(mail, contraseña).addOnCompleteListener{
                 if (it.isSuccessful){
+                    
+                    db.recuperarUsurio(
+
+                        {usuario -> recuperaUsuario(usuario) },
+                        getUser,)
+
+
                     showHome()
                 }else{
                     showAlert()
                 }
             }
 
+        
 
+    }
+    fun confGoogle(contexto : Context, idClient : String) : Intent{
+        val googleConf = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+            .requestIdToken(idClient)
+            .requestEmail()
+            .build()
 
+        val googleClient = GoogleSignIn.getClient(contexto, googleConf)
+        googleClient.signOut()
+        return googleClient.signInIntent
     }
 
     fun showHome(){
@@ -73,10 +90,14 @@ class AutenticacionUsuario(val context: Context, val activity : Activity)  {
         val dialog : AlertDialog = builder.create()
         dialog.show()
     }
-    private fun initDB(usuario : Usuario){
-        val db = database()
-        db.guardar(usuario)
+    fun recuperaUsuario(usuario : Usuario) {
+        Log.d("Desde Recuperar Usuario", "$usuario")
+        idUsuario = usuario.idUsuario
+        nombre = usuario.nombre
+        apellido = usuario.apellido
+
     }
+
 
 
 

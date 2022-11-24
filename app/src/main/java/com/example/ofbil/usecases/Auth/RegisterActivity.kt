@@ -3,7 +3,9 @@ package com.example.ofbil.usecases.Auth
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.provider.Settings
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import com.example.ofbil.HomeActivity
 import com.example.ofbil.Model.Usuario
 import com.example.ofbil.Provider.Servicios.Firebase.AutenticacionUsuario
@@ -23,6 +25,28 @@ import kotlinx.coroutines.launch
 class RegisterActivity : AppCompatActivity() {
     private lateinit var binding : ActivityRegisterBinding
     private lateinit var auth : AutenticacionUsuario
+
+    private val responseLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()){ resultado ->
+
+        val task = GoogleSignIn.getSignedInAccountFromIntent(resultado.data)
+
+        try {
+            val account = task.getResult(ApiException::class.java)
+            if (account != null){
+                val credential = GoogleAuthProvider.getCredential(account.idToken, null)
+                FirebaseAuth.getInstance().signInWithCredential(credential).addOnCompleteListener{
+                    if (it.isSuccessful){
+                        auth.showHome()
+                    }else{
+                        auth.showAlert()
+                    }
+                }
+
+            }
+        }catch (e : ApiException){
+            auth.showAlert()
+        }
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityRegisterBinding.inflate(layoutInflater)
@@ -41,10 +65,13 @@ class RegisterActivity : AppCompatActivity() {
                     nombre = binding.regEdtNombre.text.toString(),
                     apellido = binding.regEdtApellido.text.toString(),
                     fechaNacimiento = binding.regEdtDate.text.toString(),
-                    mail = mail
+                    idUsuario = mail
                 )
                 auth.signUp(mail, password, datos)
-                auth.showHome()
+
+
+
+
             }else{
                 Toast.makeText(this, "No se pudo registrar para autenticar", Toast.LENGTH_SHORT).show()
             }
@@ -57,14 +84,8 @@ class RegisterActivity : AppCompatActivity() {
         binding.googleBoton.setOnClickListener {
 
             // Configuracion
-            val googleConf = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken(getString(R.string.default_web_client_id))
-                .requestEmail()
-                .build()
-
-            val googleClient = GoogleSignIn.getClient(this, googleConf)
-            googleClient.signOut()
-            startActivityForResult(googleClient.signInIntent,100)
+            val googleClient = auth.confGoogle(this, getString(R.string.default_web_client_id))
+            responseLauncher.launch(googleClient)
 
         }
     }
@@ -76,33 +97,7 @@ class RegisterActivity : AppCompatActivity() {
     }
 
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
 
-        super.onActivityResult(requestCode, resultCode, data)
-
-        if (requestCode == 100){
-            val task = GoogleSignIn.getSignedInAccountFromIntent(data)
-
-            try {
-                val account = task.getResult(ApiException::class.java)
-                if (account != null){
-                    val credential = GoogleAuthProvider.getCredential(account.idToken, null)
-                    FirebaseAuth.getInstance().signInWithCredential(credential).addOnCompleteListener{
-                        if (it.isSuccessful){
-                            auth.showHome()
-                        }else{
-                            auth.showAlert()
-                        }
-                    }
-
-                }
-            }catch (e : ApiException){
-                auth.showAlert()
-            }
-
-        }
-
-    }
 
 
 }

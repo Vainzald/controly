@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".usecases.Movimientos.MovimientosFragment">
+
+    <!-- TODO: Update blank fragment layout -->
+
+    <TextView
+        android:id="@+id/frgMv_tituloFragment"
+        android:layout_width="172dp"
+        android:layout_height="33dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+
+        android:layout_marginStart="11dp"
+        android:layout_marginTop="9dp"
+        android:textSize="25sp"
+        android:text="Transacciones" />
+
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/frgMv_tablayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/frgMv_tituloFragment"
+        android:layout_marginTop="36dp"
+        android:background="@drawable/style_tab_bg"
+        app:tabIndicator="@drawable/style_indicator_tab_bg"
+        app:tabIndicatorAnimationMode="elastic"
+        app:tabIndicatorColor="@color/Gainsboro"
+        app:tabIndicatorHeight="40dp"
+        app:tabMode="auto"
+        app:tabSelectedTextColor="@color/Gainsboro"
+        app:tabTextColor="@color/Eerie_Black"
+        tools:ignore="SpeakableTextPresentCheck">
+
+        <com.google.android.material.tabs.TabItem
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@color/black"
+            android:text="Todos" />
+
+        <com.google.android.material.tabs.TabItem
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Ingresos" />
+
+        <com.google.android.material.tabs.TabItem
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Gastos" />
+    </com.google.android.material.tabs.TabLayout>
+
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/frgMV_pager"
+        android:layout_width="match_parent"
+        android:layout_height="724dp"
+        android:layout_below="@+id/frgMv_tablayout"
+        android:layout_marginTop="1dp" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/frgMv_buttonFloat"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginEnd="11dp"
+        android:layout_marginBottom="17dp"
+        android:backgroundTint="@color/coloIcono"
+        android:src="@drawable/ic_baseline_add_24"
+        tools:ignore="SpeakableTextPresentCheck"
+        android:elevation="5dp"/>
+
+</RelativeLayout>

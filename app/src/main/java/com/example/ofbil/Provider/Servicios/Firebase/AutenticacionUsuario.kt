@@ -6,23 +6,30 @@ import android.content.Context
 import android.content.Intent
 import android.util.Log
 import com.example.ofbil.Model.Usuario
+import com.example.ofbil.Provider.Preferencias.ControlyPreferencesApp.Companion.prefs
+import com.example.ofbil.ViewModel.FirestoreViewModel
+import com.example.ofbil.usecases.Auth.UserDataActivity
 import com.example.ofbil.usecases.Base.BaseActivityRouter
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 
-class AutenticacionUsuario(val context: Context, val activity : Activity)  {
+
+class AutenticacionUsuario(val context: Context? = null, var activity : Activity? = null) {
 
     private val GOOGLE_SIGN_IN = 100
-    private var sesion : Boolean = false
-    private var intent : BaseActivityRouter = BaseActivityRouter()
-    private var db : database = database()
-    private var idUsuario : String = ""
-    private var apellido : String = ""
-    private var nombre : String = ""
+    private var sesion: Boolean = false
+    private var intent: BaseActivityRouter = BaseActivityRouter()
+    private var db: database = database(context)
+    private var idUsuario: String = ""
+    private var apellido: String = ""
+    private var nombre: String = ""
+    private var VMFirebase = FirestoreViewModel()
 
 
-    fun signUp(mail : String, Contraseña : String,usuario: Usuario ) : Boolean{
+    fun signUp(mail: String, Contraseña: String, usuario: Usuario): Boolean {
 
         FirebaseAuth.getInstance()
             .createUserWithEmailAndPassword(
@@ -32,9 +39,7 @@ class AutenticacionUsuario(val context: Context, val activity : Activity)  {
                 if (it.isSuccessful) {
                     it.addOnCompleteListener {
                         db.guardar(usuario)
-                        showHome()
                     }
-
 
                 } else {
                     showAlert()
@@ -44,27 +49,23 @@ class AutenticacionUsuario(val context: Context, val activity : Activity)  {
 
 
     }
-    fun signIn(mail: String, contraseña: String, getUser: (String, String, String) -> Unit) {
+
+    fun signIn(mail: String, contraseña: String) {
 
         FirebaseAuth.getInstance()
-            .signInWithEmailAndPassword(mail, contraseña).addOnCompleteListener{
-                if (it.isSuccessful){
-                    
-                    db.recuperarUsurio(
+            .signInWithEmailAndPassword(mail, contraseña).addOnCompleteListener {
+                if (it.isSuccessful) {
 
-                        {usuario -> recuperaUsuario(usuario) },
-                        getUser,)
-
-
-                    showHome()
-                }else{
+                    db.recuperarUsurio(mail) {usuario -> guardarPreferencias(usuario.notificacion, usuario.idUsuario) }
+                    VMFirebase.VMretrieveUserInformation(mail) { activity -> showExtraActivity(activity) }
+                    prefs.saveId(mail)
+                } else {
                     showAlert()
                 }
             }
 
-        
-
     }
+
     fun confGoogle(contexto : Context, idClient : String) : Intent{
         val googleConf = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestIdToken(idClient)
@@ -77,11 +78,12 @@ class AutenticacionUsuario(val context: Context, val activity : Activity)  {
     }
 
     fun showHome(){
-        val homeIntent = Intent(context, activity::class.java)
-        intent.launch(homeIntent, context)
+        val homeIntent = Intent(context, activity!!::class.java)
+        intent.launch(homeIntent, context!!)
 
 
     }
+
     fun showAlert(){
         val builder = AlertDialog.Builder(context)
         builder.setTitle("error")
@@ -90,13 +92,23 @@ class AutenticacionUsuario(val context: Context, val activity : Activity)  {
         val dialog : AlertDialog = builder.create()
         dialog.show()
     }
-    fun recuperaUsuario(usuario : Usuario) {
-        Log.d("Desde Recuperar Usuario", "$usuario")
-        idUsuario = usuario.idUsuario
-        nombre = usuario.nombre
-        apellido = usuario.apellido
 
+
+
+    fun showExtraActivity(activity: Activity){
+        val iActivityExtra = Intent(context, activity::class.java)
+        intent.launch(iActivityExtra, context!!)
     }
+
+    fun cerrarSesion(){
+        FirebaseAuth.getInstance().signOut()
+    }
+    fun guardarPreferencias(notificaciones : Boolean, idUsuario : String){
+        Log.d("Se guardo la preferencia??", notificaciones.toString())
+        prefs.saveNotificaciones(notificaciones)
+        prefs.saveId(idUsuario)
+    }
+
 
 
 

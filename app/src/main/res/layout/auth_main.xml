@@ -54,6 +54,7 @@
             android:id="@+id/loginBoton"
             android:layout_width="250dp"
             android:layout_height="wrap_content"
+            android:background="@drawable/style_btn_add_transaccion"
             android:layout_weight="1"
             android:text="Acceder" />
 
@@ -64,36 +65,14 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <LinearLayout
-
-            android:id="@+id/googleBoton"
-            android:layout_gravity="center"
-            android:layout_width="wrap_content"
-            android:layout_height="50dp"
-            android:orientation="horizontal"
-            android:layout_marginTop="15dp"
-            android:scrollbarAlwaysDrawHorizontalTrack="false"
-            tools:ignore="SpeakableTextPresentCheck">
-
-            <ImageView
-                android:layout_width="50dp"
-                android:layout_height="match_parent"
-                android:src="@drawable/google" />
-
-        </LinearLayout>
-
         <Button
             android:id="@+id/button"
             android:layout_width="250dp"
             android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
             android:layout_gravity="center"
+            android:background="@drawable/style_btn_add_transaccion"
             android:text="Registrarse" />
-
-        <Button
-            android:id="@+id/button2"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Button" />
 
     </LinearLayout>
 

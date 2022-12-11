@@ -12,6 +12,7 @@ import com.example.ofbil.Provider.Servicios.Firebase.AutenticacionUsuario
 import com.example.ofbil.Provider.Servicios.Firebase.database
 import com.example.ofbil.R
 import com.example.ofbil.databinding.ActivityRegisterBinding
+import com.example.ofbil.usecases.common.DatePickerFragment
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
@@ -26,27 +27,28 @@ class RegisterActivity : AppCompatActivity() {
     private lateinit var binding : ActivityRegisterBinding
     private lateinit var auth : AutenticacionUsuario
 
-    private val responseLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()){ resultado ->
 
-        val task = GoogleSignIn.getSignedInAccountFromIntent(resultado.data)
-
-        try {
-            val account = task.getResult(ApiException::class.java)
-            if (account != null){
-                val credential = GoogleAuthProvider.getCredential(account.idToken, null)
-                FirebaseAuth.getInstance().signInWithCredential(credential).addOnCompleteListener{
-                    if (it.isSuccessful){
-                        auth.showHome()
-                    }else{
-                        auth.showAlert()
-                    }
-                }
-
-            }
-        }catch (e : ApiException){
-            auth.showAlert()
-        }
-    }
+//    private val responseLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()){ resultado ->
+//
+//        val task = GoogleSignIn.getSignedInAccountFromIntent(resultado.data)
+//
+//        try {
+//            val account = task.getResult(ApiException::class.java)
+//            if (account != null){
+//                val credential = GoogleAuthProvider.getCredential(account.idToken, null)
+//                FirebaseAuth.getInstance().signInWithCredential(credential).addOnCompleteListener{
+//                    if (it.isSuccessful){
+//                        auth.showHome()
+//                    }else{
+//                        auth.showAlert()
+//                    }
+//                }
+//
+//            }
+//        }catch (e : ApiException){
+//            auth.showAlert()
+//        }
+//    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityRegisterBinding.inflate(layoutInflater)
@@ -65,34 +67,40 @@ class RegisterActivity : AppCompatActivity() {
                     nombre = binding.regEdtNombre.text.toString(),
                     apellido = binding.regEdtApellido.text.toString(),
                     fechaNacimiento = binding.regEdtDate.text.toString(),
-                    idUsuario = mail
+                    idUsuario = mail,
+                    false
                 )
+                auth.activity = UserDataActivity()
                 auth.signUp(mail, password, datos)
-
-
-
 
             }else{
                 Toast.makeText(this, "No se pudo registrar para autenticar", Toast.LENGTH_SHORT).show()
             }
 
-
-
-
-
         }
-        binding.googleBoton.setOnClickListener {
+        binding.regEdtDate.setOnClickListener { showDatePickerDialog() }
 
-            // Configuracion
-            val googleClient = auth.confGoogle(this, getString(R.string.default_web_client_id))
-            responseLauncher.launch(googleClient)
+    }
 
-        }
+    private fun showDatePickerDialog() {
+        val datePicker = DatePickerFragment { day, month, year -> onDateSelected(day, month, year) }
+        datePicker.show(supportFragmentManager, "datePicker")
+
     }
 
     private fun initAuth() {
         val register = AutenticacionUsuario(this, HomeActivity())
         auth = register
+
+    }
+
+    fun onDateSelected(day: Int, month: Int, Year : Int){
+
+        var mes = month + 1
+        var Dia = day.toString()
+        var year = Year.toString()
+        val fechaa = "${year}/${mes}/${Dia}"
+        binding.regEdtDate.text = fechaa
 
     }
 
